@@ -19,6 +19,12 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 
   fs.readFile('config.json', 'utf8', function(err, contents) {
+
+    if (err) {
+      alert("An error occured while reading JSON Object to File.");
+      return console.log(err);
+    }
+
     var config = new Config();
     config.loadConfigFromString(contents);
 
