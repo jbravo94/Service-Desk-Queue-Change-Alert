@@ -6,7 +6,6 @@ const Config = require('./config');
 const { BrowserWindow } = require('electron').remote;
 var https = require('https');
 const URL = require('url').URL;
-
 const express = require('express');
 const rest = express();
 const port = 33457;

@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow} = require('electron');
+const {app, BrowserWindow, Menu, Tray} = require('electron');
 const path = require('path');
 
 function createWindow () {
@@ -9,11 +9,42 @@ function createWindow () {
     height: 250,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
-    }
+    },
+    icon:'./Icon-48.png',
+    title: "Service Desk Queue Change Alert"
   })
 
   // and load the index.html of the app.
   mainWindow.loadFile('index.html')
+
+  mainWindow.on('minimize',function(event){
+    event.preventDefault();
+    mainWindow.hide();
+  });
+
+  mainWindow.on('close', function (event) {
+      if(!app.isQuitting){
+          event.preventDefault();
+          mainWindow.hide();
+      }
+
+      return false;
+  });
+  mainWindow.setMenu(null);
+
+  var appIcon = null;
+  appIcon = new Tray('./Icon-16.png');
+  var contextMenu = Menu.buildFromTemplate([
+    { label: 'Show App', click:  function(){
+        mainWindow.show();
+    } },
+    { label: 'Quit', click:  function(){
+        app.isQuitting = true;
+        app.quit();
+    } }
+  ]);
+  appIcon.setToolTip('Service Desk Queue Change Alert');
+  appIcon.setContextMenu(contextMenu);
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
