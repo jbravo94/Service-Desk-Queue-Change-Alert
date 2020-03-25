@@ -10,7 +10,7 @@ function createWindow () {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     },
-    icon:'./Icon-48.png',
+    icon: path.join(__dirname, 'Icon-48.png'),
     title: "Service Desk Queue Change Alert"
   })
 
@@ -33,7 +33,7 @@ function createWindow () {
   mainWindow.setMenu(null);
 
   var appIcon = null;
-  appIcon = new Tray('./Icon-16.png');
+  appIcon = new Tray(path.join(__dirname, 'Icon-16.png'));
   var contextMenu = Menu.buildFromTemplate([
     { label: 'Show App', click:  function(){
         mainWindow.show();
