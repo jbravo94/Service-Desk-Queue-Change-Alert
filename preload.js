@@ -133,7 +133,7 @@ function enableInterval() {
     });
 
     req.on('error', (e) => {
-      alert.error(JSON.stringify(e));
+      alert.error("Error occured: " + JSON.stringify(e));
     });
 
     req.end();
