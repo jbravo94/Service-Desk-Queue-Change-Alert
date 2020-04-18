@@ -10,6 +10,7 @@ const express = require('express');
 const rest = express();
 const port = 33457;
 
+
 const basicAuth = require('express-basic-auth');
 
 rest.use(basicAuth({
@@ -209,4 +210,9 @@ rest.post('/setcrowdtokenkey', function (req, res) {
   }
 });
 
-rest.listen(port, () => console.log(`Chrome extension connector listening on port ${port}!`));
+/*https.createServer({
+  key: privateKeyPEM,
+  cert: certPEM,
+  passphrase: password
+}, rest)
+.listen(port, () => console.log(`Chrome extension connector listening on port ${port}!`));*/
