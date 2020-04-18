@@ -106,9 +106,9 @@ rest.get('/dev', function(req, res) {
 });
 
 https.createServer({
-  key: privateKeyPEM/*fs.readFileSync('./privatekey.pem')*/,
-  cert: certPEM/*fs.readFileSync('./cert.pem')*/,
-  passphrase: password
+  key: fs.readFileSync('./privatekey.pem'),
+  cert: fs.readFileSync('./cert.pem'),
+  passphrase: fs.readFileSync('./password.txt', "utf8")
 }, rest)
 .listen(port, () => console.log(`Chrome extension connector listening on port ${port}!`));
 
