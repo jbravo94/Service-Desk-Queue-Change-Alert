@@ -5,11 +5,15 @@ const express = require('express');
 const rest = express();
 const port = 33457;
 const fs = require('fs');
-var https = require('https');
+const https = require('https');
+const os = require("os");
 
+const currentOSUserName = os.userInfo().username;
 
 // https://github.com/atom/node-keytar
-//const keytar = require('keytar');
+// https://github.com/atom/node-keytar/issues/215
+// $(npm bin)/electron-rebuild
+const keytar = require('keytar');
 
 // https://nodejs.org/api/crypto.html#crypto_crypto_generatekeypair_type_options_callback
 const crypto = require('crypto');
@@ -17,9 +21,23 @@ const crypto = require('crypto');
 // https://github.com/digitalbazaar/forge#x509
 var forge = require('node-forge');
 
+console.log("Fetching Password.");
+
+keytar.getPassword("ServiceDeskQueueChangeAlert", currentOSUserName).then((pw) => {
+
+  console.log(pw)
+  if (!pw) {
+    console.log("Generating Password.");
+    // https://www.codota.com/code/javascript/modules/node-forge
+    keytar.setPassword("ServiceDeskQueueChangeAlert", currentOSUserName, "pw");
+    pw = "pw";
+  }
+  console.log("Password is " + pw + " for user " + currentOSUserName);
+
+});
+
 
 const password = crypto.randomBytes(64).toString('hex').toUpperCase();;
-
 
 
 var keys = forge.pki.rsa.generateKeyPair(2048);
