@@ -2,22 +2,19 @@
 // It has the same sandbox as a Chrome extension.
 
 const fs = require('fs');
-const Config = require('./config');
-const { BrowserWindow } = require('electron').remote;
-var https = require('https');
-const URL = require('url').URL;
+const https = require('https');
 const express = require('express');
-const rest = express();
-const port = 33457;
-
-
 const basicAuth = require('express-basic-auth');
 
-rest.use(basicAuth({
-    users: { 'chromeext': 'supersecret' }
-}));
+const URL = require('url').URL;
 
-rest.use(express.json());
+const { BrowserWindow } = require('electron').remote;
+
+const Config = require('./config');
+const startServerWithCrypto = require('./authFactory');
+
+const rest = express();
+const port = 33457;
 
 var intervalObj = null;
 var issueQueueCount = null;
@@ -28,6 +25,12 @@ var DEV_MODE = false;
 var DEV_INTERVAL = DEV_MODE ? 1 : 60;
 
 var config = new Config();
+
+rest.use(basicAuth({
+  users: { 'chromeext': 'supersecret' }
+}));
+
+rest.use(express.json());
 
 function loadConfig(callback) {
   fs.readFile('config.json', 'utf8', function (err, contents) {
@@ -53,7 +56,7 @@ window.addEventListener('DOMContentLoaded', () => {
     replaceText(`${type}-version`, process.versions[type])
   }
 
-  loadConfig(function(){
+  loadConfig(function () {
     config.setFormValues();
     enableInterval();
   });
@@ -73,73 +76,73 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  
+
   $('#enableFunctionality').change(function () {
 
     if ($(this).is(':checked')) {
 
       enableInterval();
-      
+
     } else {
       clearInterval(intervalObj);
     }
   });
 
 
-function enableInterval() {
-  intervalObj = setInterval(() => {
+  function enableInterval() {
+    intervalObj = setInterval(() => {
 
-    var headers = {
-      'Content-Type': 'application/json',
-      'X-ExperimentalApi': 'opt-in'
-    };
+      var headers = {
+        'Content-Type': 'application/json',
+        'X-ExperimentalApi': 'opt-in'
+      };
 
-    if (config.crowdTokenKey) {
-      var cookie = `crowd.token_key=${config.crowdTokenKey}`;
-      headers['Cookie'] = cookie;
-    } else {
-      headers["Authorization"] = "Basic " + btoa(config.username + ":" + config.password);
-    }
+      if (config.crowdTokenKey) {
+        var cookie = `crowd.token_key=${config.crowdTokenKey}`;
+        headers['Cookie'] = cookie;
+      } else {
+        headers["Authorization"] = "Basic " + btoa(config.username + ":" + config.password);
+      }
 
-    var hostname = new URL(config.baseurl).hostname;
+      var hostname = new URL(config.baseurl).hostname;
 
-    const options = {
-      hostname: hostname,
-      port: 443,
-      path: `/rest/servicedeskapi/servicedesk/${config.serviceDeskId}/queue/${config.queueId}?includeCount=true`,
-      method: 'GET',
-      headers: headers
-    };
+      const options = {
+        hostname: hostname,
+        port: 443,
+        path: `/rest/servicedeskapi/servicedesk/${config.serviceDeskId}/queue/${config.queueId}?includeCount=true`,
+        method: 'GET',
+        headers: headers
+      };
 
-    var bodyBuffer = [];
+      var bodyBuffer = [];
 
-    const req = https.request(options, (res) => {
-      console.log('statusCode:', res.statusCode);
-      console.log('headers:', res.headers);
+      const req = https.request(options, (res) => {
+        console.log('statusCode:', res.statusCode);
+        console.log('headers:', res.headers);
 
-      res.on('data', (d) => {
+        res.on('data', (d) => {
 
-        bodyBuffer = bodyBuffer.concat(d);
+          bodyBuffer = bodyBuffer.concat(d);
+        });
+
+        res.on('end', () => {
+
+          var body = JSON.parse(bodyBuffer.toString());
+          console.log(body);
+          console.log('No more data in response.');
+
+          processResponse(body.issueCount);
+
+        })
       });
 
-      res.on('end', () => {
+      req.on('error', (e) => {
+        alert.error("Error occured: " + JSON.stringify(e));
+      });
 
-        var body = JSON.parse(bodyBuffer.toString());
-        console.log(body);
-        console.log('No more data in response.');
-
-        processResponse(body.issueCount);
-
-      })
-    });
-
-    req.on('error', (e) => {
-      alert.error("Error occured: " + JSON.stringify(e));
-    });
-
-    req.end();
-  }, config.interval * DEV_INTERVAL * 1000);
-}
+      req.end();
+    }, config.interval * DEV_INTERVAL * 1000);
+  }
 })
 
 function processResponse(issueQueueCount) {
@@ -195,24 +198,30 @@ rest.post('/setcrowdtokenkey', function (req, res) {
           console.log("An error occured while writing JSON Object to File.");
           throw new Error(err);
         }
-  
+
         config = configC;
         config.setFormValues();
 
         console.log("Config has been saved.");
-        res.send({message: "OK"});
+        res.send({ message: "OK" });
       });
 
     });
-  
+
   } else {
     throw new Error("Token missing in payload.");
   }
 });
 
-/*https.createServer({
-  key: privateKeyPEM,
-  cert: certPEM,
-  passphrase: password
-}, rest)
-.listen(port, () => console.log(`Chrome extension connector listening on port ${port}!`));*/
+rest.get('/test', function (req, res) {
+  res.send('hello world');
+});
+
+startServerWithCrypto(
+  (encKey, cert, password) => https.createServer({
+    key: encKey,
+    cert: cert,
+    passphrase: password
+  }, rest)
+    .listen(port, () => console.log(`Chrome extension connector listening on port ${port}!`))
+);
