@@ -8,13 +8,14 @@ const basicAuth = require('express-basic-auth');
 
 const URL = require('url').URL;
 
-const { BrowserWindow } = require('electron').remote;
+const { BrowserWindow, shell } = require('electron').remote;
 
 const Config = require('./config');
 const startServerWithCrypto = require('./authFactory');
 
 const rest = express();
 const port = 33457;
+const filehostingport = 33458;
 
 var intervalObj = null;
 var issueQueueCount = null;
@@ -76,6 +77,9 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  $('#installChromeExtension').click(function() {
+    shell.openItem('./extension/cookieextractor.crx');
+  });
 
   $('#enableFunctionality').change(function () {
 
@@ -216,6 +220,22 @@ rest.post('/setcrowdtokenkey', function (req, res) {
 rest.get('/test', function (req, res) {
   res.send('hello world');
 });
+
+rest.use('/extension', express.static(__dirname + '/extension'));
+
+// const filehosting = express();
+
+// filehosting.use('/extension', express.static(__dirname + '/extension'));
+
+/*
+filehosting.get('/cookieextractor.crx', function (req, res) {
+  res.download('./cookieextractor.crx', 'cookieextractor.crx'); 
+});
+*/
+
+// http://localhost:33458/cookieextractor/updates.xml
+
+// filehosting.listen(filehostingport, () => console.log(`Chrome extension hosting listening on port ${filehostingport}!`))
 
 startServerWithCrypto(
   (encKey, cert, password) => https.createServer({

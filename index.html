@@ -24,64 +24,77 @@
     </div>
     <br />
 
-    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample"
-      aria-expanded="false" aria-controls="collapseExample">
-      Config
-    </button>
-    </p>
-    <div class="collapse" id="collapseExample">
+    <div class="accordion" id="accordionExample">
 
-      <form>
-        <div class="form-group row">
-          <label for="baseurl" class="col-sm-2 col-form-label">Jira Baseurl</label>
-          <div class="col-sm-10">
-            <input type="text" class="form-control" id="baseurl" placeholder="https://jira.heinzl.dev">
-          </div>
-        </div>
-        <div class="form-group row">
-          <label for="username" class="col-sm-2 col-form-label">Username</label>
-          <div class="col-sm-10">
-            <input type="text" class="form-control" id="username" placeholder="email@example.com">
-          </div>
-        </div>
-        <div class="form-group row">
-          <label for="password" class="col-sm-2 col-form-label">Password</label>
-          <div class="col-sm-10">
-            <input type="password" class="form-control" id="password">
-          </div>
-        </div>
+      <button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapseExample"
+        aria-expanded="false" aria-controls="collapseExample">
+        Config
+      </button>
+      <button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapseMore"
+        aria-expanded="false" aria-controls="collapseMore">
+        More
+      </button>
+      </p>
+      <div class="collapse" id="collapseMore" data-parent="#accordionExample">
+        <button class="btn btn-primary" type="button" id="installChromeExtension">
+        Install Chrome Extension  
+      </button>
+      </div>
 
-        <div class="form-group row">
-          <label for="crowdTokenKey" class="col-sm-2 col-form-label">Crowd Token Key</label>
-          <div class="col-sm-10">
-            <input type="text" class="form-control" id="crowdTokenKey">
+      <div class="collapse" id="collapseExample" data-parent="#accordionExample">
+
+        <form>
+          <div class="form-group row">
+            <label for="baseurl" class="col-sm-2 col-form-label">Jira Baseurl</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" id="baseurl" placeholder="https://jira.heinzl.dev">
+            </div>
           </div>
-        </div>
-
-        <div class="form-group row">
-          <label for="exampleFormControlInput1" class="col-sm-2 col-form-label">Service Desk ID</label>
-          <div class="col-sm-10">
-            <input type="number" class="form-control" id="serviceDeskId" min="1" placeholder="Enter Service Desk ID">
+          <div class="form-group row">
+            <label for="username" class="col-sm-2 col-form-label">Username</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" id="username" placeholder="email@example.com">
+            </div>
           </div>
-        </div>
-
-        <div class="form-group row">
-          <label for="exampleFormControlInput1" class="col-sm-2 col-form-label">Queue ID</label>
-          <div class="col-sm-10">
-            <input type="number" class="form-control" id="queueId" placeholder="Enter Queue ID">
+          <div class="form-group row">
+            <label for="password" class="col-sm-2 col-form-label">Password</label>
+            <div class="col-sm-10">
+              <input type="password" class="form-control" id="password">
+            </div>
           </div>
-        </div>
 
-        <div class="form-group row">
-          <label for="exampleFormControlInput1" class="col-sm-2 col-form-label">Check interval</label>
-          <div class="col-sm-10">
-            <input type="number" class="form-control" id="interval" min="1" placeholder="Enter value in minutes">
+          <div class="form-group row">
+            <label for="crowdTokenKey" class="col-sm-2 col-form-label">Crowd Token Key</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" id="crowdTokenKey">
+            </div>
           </div>
-        </div>
 
-        <button id="save" type="button" class="btn btn-primary">Save</button>
+          <div class="form-group row">
+            <label for="exampleFormControlInput1" class="col-sm-2 col-form-label">Service Desk ID</label>
+            <div class="col-sm-10">
+              <input type="number" class="form-control" id="serviceDeskId" min="1" placeholder="Enter Service Desk ID">
+            </div>
+          </div>
 
-      </form>
+          <div class="form-group row">
+            <label for="exampleFormControlInput1" class="col-sm-2 col-form-label">Queue ID</label>
+            <div class="col-sm-10">
+              <input type="number" class="form-control" id="queueId" placeholder="Enter Queue ID">
+            </div>
+          </div>
+
+          <div class="form-group row">
+            <label for="exampleFormControlInput1" class="col-sm-2 col-form-label">Check interval</label>
+            <div class="col-sm-10">
+              <input type="number" class="form-control" id="interval" min="1" placeholder="Enter value in minutes">
+            </div>
+          </div>
+
+          <button id="save" type="button" class="btn btn-primary">Save</button>
+
+        </form>
+      </div>
     </div>
   </div>
 
