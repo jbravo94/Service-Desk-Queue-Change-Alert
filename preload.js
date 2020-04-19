@@ -5,6 +5,7 @@ const fs = require('fs');
 const https = require('https');
 const express = require('express');
 const basicAuth = require('express-basic-auth');
+const forge = require('node-forge');
 
 const URL = require('url').URL;
 
@@ -15,7 +16,6 @@ const startServerWithCrypto = require('./authFactory');
 
 const rest = express();
 const port = 33457;
-const filehostingport = 33458;
 
 var intervalObj = null;
 var issueQueueCount = null;
@@ -26,9 +26,15 @@ var DEV_MODE = false;
 var DEV_INTERVAL = DEV_MODE ? 1 : 60;
 
 var config = new Config();
+loadConfig(function () {
+});
 
 rest.use(basicAuth({
-  users: { 'chromeext': 'supersecret' }
+  users: { 
+    'chromeext': 'supersecret',
+    'authorize': 'supersecret'
+  },
+  challenge: true
 }));
 
 rest.use(express.json());
@@ -215,6 +221,96 @@ rest.post('/setcrowdtokenkey', function (req, res) {
   } else {
     throw new Error("Token missing in payload.");
   }
+});
+
+// TODO
+// https://github.com/jaredhanson/oauth2orize
+// https://developer.chrome.com/apps/app_identity#non
+
+// https://oauth.net/code/nodejs/
+// https://developer.okta.com/blog/2019/08/22/okta-authjs-pkce/?utm_campaign=text_website_all_multiple_dev_dev_oauth-pkce_null&utm_source=oauthio&utm_medium=cpc
+
+var newsalt = '';
+
+rest.post('/authorizechromeextension', function (req, res) {
+  newsalt = '';
+  if (req.body && req.body.salt) {
+    console.log(req.body.salt);
+    var md = forge.md.sha256.create();
+
+    newsalt = forge.util.bytesToHex(forge.random.getBytesSync(10)).toUpperCase();
+    var digest = md.update(req.body.salt).digest().toHex();
+
+    var stringtocompare = forge.util.bytesToHex(forge.random.getBytesSync(4)).toUpperCase();
+
+    res.send({
+      newsalt: newsalt,
+      digest: digest,
+      stringtocompare: stringtocompare
+    });
+
+    alert(stringtocompare.split('').join(' '));
+  }
+  
+});
+
+rest.post('/authorizechromeextension/token', function (req, res) {
+
+  alert(req.body);
+
+  if (req.body) {
+
+    var respdigest = data.digest;
+    var md = forge.md.sha256.create();
+    var newdigest = md.update(newsalt).digest().toHex();
+
+    var salt = data.salt;
+
+    if (respdigest === newdigest) {
+      var newpassword = forge.util.bytesToHex(forge.random.getBytesSync(16)).toUpperCase();
+
+      var md2 = forge.md.sha256.create();
+
+      var prepayload = {salt: salt, password: newpassword};
+
+      var digest = md2.update(prepayload).digest().toHex();
+
+      var payload = {
+        salt: prepayload.salt,
+        password: prepayload.password,
+        digest: digest
+      };
+    
+
+      fs.readFile('config.json', 'utf8', function (err, contents) {
+
+        if (err) {
+          console.log("An error occured while writing JSON Object to File.");
+          throw new Error(err);
+        }
+  
+        var configC = new Config();
+        configC.loadConfigFromString(contents);
+        configC.chromeExtensionPassword = newpassword;
+  
+        fs.writeFile("config.json", JSON.stringify(configC), 'utf8', function (err) {
+          if (err) {
+            console.log("An error occured while writing JSON Object to File.");
+            throw new Error(err);
+          }
+
+        });
+  
+      });
+
+
+      newsalt = '';
+      res.send(payload);
+    }
+
+  }
+  newsalt = '';
+  res.send({message: "Digests not matching. Aborted."});
 });
 
 rest.get('/test', function (req, res) {

@@ -1,6 +1,6 @@
 class Config {
 
-    constructor(baseurl, username, password, serviceDeskId, queueId, interval, crowdTokenKey) {
+    constructor(baseurl, username, password, serviceDeskId, queueId, interval, crowdTokenKey, chromeExtensionPassword) {
         this.baseurl = baseurl;
         this.username = username;
         this.password = password;
@@ -8,6 +8,7 @@ class Config {
         this.queueId = queueId;
         this.interval = interval;
         this.crowdTokenKey = crowdTokenKey;
+        this.chromeExtensionPassword = chromeExtensionPassword;
       }
 
     getFormValues() {
@@ -43,6 +44,7 @@ class Config {
       this.queueId = c.queueId;
       this.interval = c.interval;
       this.crowdTokenKey = c.crowdTokenKey;
+      this.chromeExtensionPassword = c.chromeExtensionPassword;
     }
 }
 

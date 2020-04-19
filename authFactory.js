@@ -1,6 +1,5 @@
 const os = require("os");
 const keytar = require('keytar');
-const crypto = require('crypto');
 const forge = require('node-forge');
 const fs = require('fs');
 
@@ -35,7 +34,7 @@ const generateCrypto = function (password) {
     var encKey = forge.pki.encryptRsaPrivateKey(privateKey, password);
 
     certificate.publicKey = keys.publicKey;
-    certificate.serialNumber = crypto.randomBytes(16).toString('hex').toUpperCase();
+    certificate.serialNumber = forge.util.bytesToHex(forge.random.getBytesSync(16)).toUpperCase();
     certificate.validity.notBefore = new Date();
     certificate.validity.notBefore.setDate(certificate.validity.notBefore.getDate() - 1);
     certificate.validity.notAfter = new Date();
@@ -114,7 +113,7 @@ const getPrivateKeyAndCertificate = async function () {
     var pw = await keytar.getPassword(appIdentifier, currentOSUserName);
 
     if (!pw) {
-        const password = crypto.randomBytes(64).toString('hex').toUpperCase();;
+        const password = forge.util.bytesToHex(forge.random.getBytesSync(64)).toUpperCase();
 
         // https://www.codota.com/code/javascript/modules/node-forge
         await keytar.setPassword(appIdentifier, currentOSUserName, password);

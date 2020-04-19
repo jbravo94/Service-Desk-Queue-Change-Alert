@@ -1,0 +1,24 @@
+Create custom shared secret which is stored in keychain.
+
+DESKTOP-APP creates secret in keychain.
+DESKTOP-APP and EXTENSION uses it as password for the REST.
+
+App-Passwords, which can access user passwords from other apps?
+=> only if approved.
+
+https://www.reddit.com/r/javascript/comments/8txe2q/how_to_securely_store_an_api_token_in_a_chrome/
+https://developers.google.com/web/fundamentals/security/credential-management
+
+Extension asks app via HTTPS.
+both shows random visual secure code.
+after confirming, the credentials are exchanged and 
+stored in keychain and chrome credential Management API store.
+
+local storage (unencrypted is sufficient, if cookies are stored similairy unencrypted.)
+
+Cookies are stored encrypted => Extension stores value also as cookie
+
+* Store crowd token encrypted && credentials 
+
+* app signature for keychain hoa determind access?
+
