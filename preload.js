@@ -24,18 +24,9 @@ var win = null;
 
 var DEV_MODE = false;
 var DEV_INTERVAL = DEV_MODE ? 1 : 60;
-
 var config = new Config();
-loadConfig(function () {
-});
 
-rest.use(basicAuth({
-  users: { 
-    'chromeext': 'supersecret',
-    'authorize': 'supersecret'
-  },
-  challenge: true
-}));
+var plainChromeExtensionPassword = null;
 
 rest.use(express.json());
 
@@ -48,6 +39,11 @@ function loadConfig(callback) {
     }
 
     config.loadConfigFromString(contents);
+
+    // verify with decryption
+
+    plainChromeExtensionPassword = config.chromeExtensionPassword;
+
     callback();
 
   });
@@ -83,7 +79,7 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  $('#installChromeExtension').click(function() {
+  $('#installChromeExtension').click(function () {
     shell.openItem('./extension/cookieextractor.crx');
   });
 
@@ -188,6 +184,10 @@ function openDialog() {
 
 rest.post('/setcrowdtokenkey', function (req, res) {
 
+  if (!plainChromeExtensionPassword) {
+    throw new Error("Chrome extension not authorized. Aborted.");
+  }
+
   if (req.body && req.body.crowdtokenkey) {
 
     const token = req.body.crowdtokenkey;
@@ -251,14 +251,16 @@ rest.post('/authorizechromeextension', function (req, res) {
 
     alert(stringtocompare.split('').join(' '));
   }
-  
+
 });
 
-rest.post('/authorizechromeextension/token', function (req, res) {
+rest.post('/authorizechromeextensiontoken', function (req, res) {
 
-  alert(req.body);
+  alert(JSON.stringify(req.body));
 
   if (req.body) {
+
+    var data = req.body;
 
     var respdigest = data.digest;
     var md = forge.md.sha256.create();
@@ -271,7 +273,7 @@ rest.post('/authorizechromeextension/token', function (req, res) {
 
       var md2 = forge.md.sha256.create();
 
-      var prepayload = {salt: salt, password: newpassword};
+      var prepayload = { salt: salt, password: newpassword };
 
       var digest = md2.update(prepayload).digest().toHex();
 
@@ -280,7 +282,7 @@ rest.post('/authorizechromeextension/token', function (req, res) {
         password: prepayload.password,
         digest: digest
       };
-    
+
 
       fs.readFile('config.json', 'utf8', function (err, contents) {
 
@@ -288,11 +290,11 @@ rest.post('/authorizechromeextension/token', function (req, res) {
           console.log("An error occured while writing JSON Object to File.");
           throw new Error(err);
         }
-  
+
         var configC = new Config();
         configC.loadConfigFromString(contents);
         configC.chromeExtensionPassword = newpassword;
-  
+
         fs.writeFile("config.json", JSON.stringify(configC), 'utf8', function (err) {
           if (err) {
             console.log("An error occured while writing JSON Object to File.");
@@ -300,7 +302,7 @@ rest.post('/authorizechromeextension/token', function (req, res) {
           }
 
         });
-  
+
       });
 
 
@@ -310,7 +312,7 @@ rest.post('/authorizechromeextension/token', function (req, res) {
 
   }
   newsalt = '';
-  res.send({message: "Digests not matching. Aborted."});
+  res.send({ message: "Digests not matching. Aborted." });
 });
 
 rest.get('/test', function (req, res) {
@@ -333,11 +335,31 @@ filehosting.get('/cookieextractor.crx', function (req, res) {
 
 // filehosting.listen(filehostingport, () => console.log(`Chrome extension hosting listening on port ${filehostingport}!`))
 
-startServerWithCrypto(
-  (encKey, cert, password) => https.createServer({
-    key: encKey,
-    cert: cert,
-    passphrase: password
-  }, rest)
-    .listen(port, () => console.log(`Chrome extension connector listening on port ${port}!`))
-);
+loadConfig(function () {
+
+  if (plainChromeExtensionPassword) {
+    rest.use(basicAuth({
+      users: {
+        'chromeext': plainChromeExtensionPassword
+      },
+      challenge: true
+    }));
+  } else {
+    rest.use(basicAuth({
+      users: {
+        'authorize': 'supersecret'
+      },
+      challenge: true
+    }));
+  }
+
+  startServerWithCrypto(
+    (encKey, cert, password) => https.createServer({
+      key: encKey,
+      cert: cert,
+      passphrase: password
+    }, rest)
+      .listen(port, () => console.log(`Chrome extension connector listening on port ${port}!`))
+  );
+
+});

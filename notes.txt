@@ -18,7 +18,10 @@ local storage (unencrypted is sufficient, if cookies are stored similairy unencr
 
 Cookies are stored encrypted => Extension stores value also as cookie
 
-* Store crowd token encrypted && credentials 
 
 * app signature for keychain hoa determind access?
 
+
+* basic auth only for certain paths
+* Store crowd token encrypted && credentials 
+* patch basic auth at runtime
