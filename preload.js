@@ -256,8 +256,6 @@ rest.post('/authorizechromeextension', function (req, res) {
 
 rest.post('/authorizechromeextensiontoken', function (req, res) {
 
-  alert(JSON.stringify(req.body));
-
   if (req.body) {
 
     var data = req.body;
@@ -300,6 +298,12 @@ rest.post('/authorizechromeextensiontoken', function (req, res) {
             console.log("An error occured while writing JSON Object to File.");
             throw new Error(err);
           }
+          rest.use(basicAuth({
+            users: {
+              'chromeext': plainChromeExtensionPassword
+            },
+            challenge: true
+          }));
 
         });
 
