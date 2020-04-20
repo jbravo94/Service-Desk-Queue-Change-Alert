@@ -22,6 +22,6 @@ Cookies are stored encrypted => Extension stores value also as cookie
 * app signature for keychain hoa determind access?
 
 
-* basic auth only for certain paths
-* Store crowd token encrypted && credentials 
-* patch basic auth at runtime
+* basic auth only for certain paths => no problem
+* Store crowd token encrypted && credentials
+* encrypt with crowd password
