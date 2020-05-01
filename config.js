@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { getPasswordFromOSKeyStore, decryptString, encryptString } = require('./authFactory');
 
 class Config {
 
@@ -40,20 +41,31 @@ class Config {
         document.getElementById("crowdTokenKey").value = this.crowdTokenKey;
     }
 
-    loadConfigFromString(string) {
+    loadConfigFromString(password, string) {
       var c = JSON.parse(string);
+
       this.baseurl = c.baseurl;
       this.username = c.username;
-      this.password = c.password;
+      this.password = decryptString(password, c.password);
       this.serviceDeskId = c.serviceDeskId;
       this.queueId = c.queueId;
       this.interval = c.interval;
-      this.crowdTokenKey = c.crowdTokenKey;
-      this.chromeExtensionPassword = c.chromeExtensionPassword;
+      this.crowdTokenKey = decryptString(password, c.crowdTokenKey);
+      this.chromeExtensionPassword = decryptString(password, c.chromeExtensionPassword);
+      
     }
 
     save(password, callback) {
-      fs.writeFile("config.json", JSON.stringify(this), 'utf8', (err) => {
+
+      var c = new Config();
+
+      c = JSON.parse(JSON.stringify(this));
+
+      c.password = encryptString(password, this.password);
+      c.crowdTokenKey = encryptString(password, this.crowdTokenKey);
+      c.chromeExtensionPassword = encryptString(password, this.chromeExtensionPassword);
+
+      fs.writeFile("config.json", JSON.stringify(c), 'utf8', (err) => {
         if (err) {
           alert("An error occured while writing JSON Object to File.");
           return console.log(err);
@@ -71,7 +83,7 @@ class Config {
             return console.log(err);
           }
 
-          this.loadConfigFromString(contents);
+          this.loadConfigFromString(password, contents);
           callback && callback(this);
       });
     }

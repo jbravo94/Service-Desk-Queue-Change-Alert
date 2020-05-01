@@ -12,7 +12,7 @@ const URL = require('url').URL;
 const { BrowserWindow, shell } = require('electron').remote;
 
 const Config = require('./config');
-const { startServerWithCrypto, getPasswordFromOSKeyStore, decryptString, encryptString } = require('./authFactory');
+const { startServerWithCrypto, getPasswordFromOSKeyStore } = require('./authFactory');
 
 const rest = express();
 const port = 33457;
@@ -28,22 +28,14 @@ var config = new Config();
 
 rest.use(express.json());
 
-decryptString("pw", encryptString("pw", "string"));
-
-//getPasswordFromOSKeyStore().then((passphrase) => alert(passphrase));
-
-
 function loadConfig(callback) {
 
-
-    config.load(null, (config) => {
+  getPasswordFromOSKeyStore().then((pw) => {
+    config.load(pw, (config) => {
       callback && callback();
     });
-  }
-
-
-
-
+  });
+}
 
 window.addEventListener('DOMContentLoaded', () => {
   const replaceText = (selector, text) => {
@@ -65,7 +57,9 @@ window.addEventListener('DOMContentLoaded', () => {
     var config = new Config();
     config.getFormValues();
 
-    config.save(null, () => {alert("Config has been saved.");});
+    getPasswordFromOSKeyStore().then((pw) => {
+    config.save(pw, () => {alert("Config has been saved.");});
+    });
   });
 
   $('#installChromeExtension').click(function () {
@@ -183,16 +177,18 @@ rest.post('/setcrowdtokenkey', function (req, res) {
 
     const token = req.body.crowdtokenkey;
 
-    config.load(null, (config) => {
-
+    getPasswordFromOSKeyStore().then((pw) => {
+    config.load(pw, (config) => {
       config.crowdTokenKey = token;
-
-      config.save(null, function() {
+      alert(JSON.stringify(config));
+      config.save(pw, function() {
+        alert(JSON.stringify(config));
         config.setFormValues();
 
         console.log("Config has been saved.");
         res.send({ message: "OK" });
       });
+    });
 
     });
 
@@ -258,12 +254,13 @@ rest.post('/authorizechromeextensiontoken', function (req, res) {
         password: prepayload.password,
         digest: digest
       };
-
-      config.load(null, (config) => {
+      getPasswordFromOSKeyStore().then((pw) => {
+      config.load(pw, (config) => {
 
         config.chromeExtensionPassword = newpassword;
 
-        config.save(null, (config) => {
+        
+        config.save(pw, (config) => {
             rest.use(basicAuth({
             users: {
               'chromeext': config.chromeExtensionPassword
@@ -273,6 +270,7 @@ rest.post('/authorizechromeextensiontoken', function (req, res) {
           newsalt = '';
           res.send(payload);
         });
+      });
 
       });
       
