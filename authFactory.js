@@ -2,26 +2,35 @@ const os = require("os");
 const keytar = require('keytar');
 const forge = require('node-forge');
 const fs = require('fs');
+const { app } = require('electron').remote;
+const path = require('path'); 
 
 const currentOSUserName = os.userInfo().username;
 
 const appIdentifier = "ServiceDeskQueueChangeAlert";
-const privateKeyFileName = "privatekey.pem";
-const publicKeyFileName = "publickey.pem";
-const certificateFileName = "cert.pem";
+
+const basePath = path.join(app.getPath("userData"), 'servicedeskqueuechangealert');
+
+if (!fs.existsSync(basePath)){
+    fs.mkdirSync(basePath);
+}
+
+const privateKeyFileName = path.join(basePath, "privatekey.pem");
+const publicKeyFileName = path.join(basePath, "publickey.pem");
+const certificateFileName = path.join(basePath, "cert.pem");
 
 const getCrypto = function (password) {
     return {
-        encryptedPrivateKeyPEM: fs.readFileSync('./' + privateKeyFileName),
-        certificatePEM: fs.readFileSync('./' + certificateFileName),
+        encryptedPrivateKeyPEM: fs.readFileSync(privateKeyFileName),
+        certificatePEM: fs.readFileSync(certificateFileName),
         password: password
     };
 };
 
 const checkCrypto = function () {
-    return fs.existsSync('./' + privateKeyFileName)
-        && fs.existsSync('./' + publicKeyFileName)
-        && fs.existsSync('./' + certificateFileName);
+    return fs.existsSync(privateKeyFileName)
+        && fs.existsSync(publicKeyFileName)
+        && fs.existsSync(certificateFileName);
 };
 
 const generateCrypto = function (password) {
@@ -96,9 +105,9 @@ const generateCrypto = function (password) {
 
     let publicKeyPEM = forge.pki.publicKeyToPem(keys.publicKey);
 
-    fs.writeFileSync('./' + privateKeyFileName, privateKeyPEM);
-    fs.writeFileSync('./' + certificateFileName, certPEM);
-    fs.writeFileSync('./' + publicKeyFileName, publicKeyPEM);
+    fs.writeFileSync(privateKeyFileName, privateKeyPEM);
+    fs.writeFileSync(certificateFileName, certPEM);
+    fs.writeFileSync(publicKeyFileName, publicKeyPEM);
 
     return {
         encryptedPrivateKeyPEM: encKey,

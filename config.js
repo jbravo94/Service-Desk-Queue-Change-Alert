@@ -1,5 +1,15 @@
 const fs = require('fs');
 const { getPasswordFromOSKeyStore, decryptString, encryptString } = require('./authFactory');
+const { app } = require('electron').remote;
+const path = require('path'); 
+
+const basePath = path.join(app.getPath("userData"), 'servicedeskqueuechangealert');
+
+if (!fs.existsSync(basePath)){
+  fs.mkdirSync(basePath);
+}
+
+const configPath = path.join(basePath, 'config.json');
 
 class Config {
 
@@ -65,7 +75,7 @@ class Config {
       c.crowdTokenKey = encryptString(password, this.crowdTokenKey);
       c.chromeExtensionPassword = encryptString(password, this.chromeExtensionPassword);
 
-      fs.writeFile("config.json", JSON.stringify(c), 'utf8', (err) => {
+      fs.writeFile(configPath, JSON.stringify(c), 'utf8', (err) => {
         if (err) {
           alert("An error occured while writing JSON Object to File.");
           return console.log(err);
@@ -76,7 +86,7 @@ class Config {
     }
 
     load(password, callback) {
-        fs.readFile('config.json', 'utf8', (err, contents) => {
+        fs.readFile(configPath, 'utf8', (err, contents) => {
 
           if (err) {
             alert("An error occured while reading JSON Object to File.");

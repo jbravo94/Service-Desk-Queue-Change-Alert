@@ -39,3 +39,6 @@ https://cloudconvert.com/png-to-icns
 * Node debugger
 * builds
 * drone files
+
+* fix tray icon
+* fix local ssl certificate trust
