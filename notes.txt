@@ -42,3 +42,4 @@ https://cloudconvert.com/png-to-icns
 
 * fix tray icon
 * fix local ssl certificate trust
+* fix quitting in app
