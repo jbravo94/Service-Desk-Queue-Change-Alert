@@ -12,7 +12,7 @@ const URL = require('url').URL;
 const { BrowserWindow, shell } = require('electron').remote;
 
 const Config = require('./config');
-const { startServerWithCrypto, getPasswordFromOSKeyStore } = require('./authFactory');
+const { startServerWithCrypto, getPasswordFromOSKeyStore, decryptString, encryptString } = require('./authFactory');
 
 const rest = express();
 const port = 33457;
@@ -28,6 +28,11 @@ var config = new Config();
 
 rest.use(express.json());
 
+decryptString("pw", encryptString("pw", "string"));
+
+//getPasswordFromOSKeyStore().then((passphrase) => alert(passphrase));
+
+
 function loadConfig(callback) {
 
 
@@ -36,36 +41,6 @@ function loadConfig(callback) {
     });
   }
 
-    // verify with decryption
-
-    /*
-
-
-//var key = forge.pkcs5.pbkdf2('password', port, numIterations, 16);
-
-
-// encrypt some bytes using CBC mode
-// (other modes include: ECB, CFB, OFB, CTR, and GCM)
-// Note: CBC and ECB modes use PKCS#7 padding as default
-var cipher = forge.cipher.createCipher('AES-CBC', key);
-cipher.start({iv: port});
-cipher.update(forge.util.createBuffer(someBytes));
-cipher.finish();
-var encrypted = cipher.output;
-// outputs encrypted hex
-console.log(encrypted.toHex());
-
-// decrypt some bytes using CBC mode
-// (other modes include: CFB, OFB, CTR, and GCM)
-var decipher = forge.cipher.createDecipher('AES-CBC', key);
-decipher.start({iv: iv});
-decipher.update(encrypted);
-var result = decipher.finish(); // check 'result' for true/false
-// outputs decrypted hex
-console.log(decipher.output.toHex());
-    */
-
-    
 
 
 
@@ -79,9 +54,6 @@ window.addEventListener('DOMContentLoaded', () => {
   for (const type of ['chrome', 'node', 'electron']) {
     replaceText(`${type}-version`, process.versions[type])
   }
-
-
-
 
   loadConfig(() => {
     config.setFormValues();

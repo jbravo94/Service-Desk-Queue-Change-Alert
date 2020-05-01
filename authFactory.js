@@ -138,7 +138,50 @@ const startServerWithCrypto = async function (callback) {
     callback(encryptedPrivateKeyPEM, certificatePEM, password);
 };
 
+
+const getKeyFromPassword = function (password) {
+    return forge.pkcs5.pbkdf2(password, "33457", 16, 16);
+}
+
+const encryptString = function (password, someBytes) {
+
+    const key = getKeyFromPassword(password);
+
+    // encrypt some bytes using CBC mode
+    // (other modes include: ECB, CFB, OFB, CTR, and GCM)
+    // Note: CBC and ECB modes use PKCS#7 padding as default
+    var cipher = forge.cipher.createCipher('AES-CBC', key);
+    cipher.start({iv: "3345733457334573"});
+    cipher.update(forge.util.createBuffer(someBytes));
+    cipher.finish();
+    var encrypted = cipher.output;
+    // outputs encrypted hex
+
+    var encryptedHexString = forge.util.bytesToHex(encrypted.getBytes())
+    return encryptedHexString;
+}
+
+const decryptString = function (password, encryptedHexString) {
+
+    const encrypted = forge.util.hexToBytes(encryptedHexString);
+    const key = getKeyFromPassword(password);
+
+    // decrypt some bytes using CBC mode
+    // (other modes include: CFB, OFB, CTR, and GCM)
+    var decipher = forge.cipher.createDecipher('AES-CBC', key);
+    decipher.start({iv: "3345733457334573"});
+    decipher.update(forge.util.createBuffer(encrypted, 'raw'));
+    var result = decipher.finish(); // check 'result' for true/false
+    // outputs decrypted hex
+    const decryptedString = decipher.output.toString();
+
+    return decryptedString;
+}
+    
+
 module.exports = {
     startServerWithCrypto: startServerWithCrypto,
     getPasswordFromOSKeyStore: getPasswordFromOSKeyStore,
+    encryptString: encryptString,
+    decryptString: decryptString,
 };
