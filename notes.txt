@@ -29,7 +29,7 @@ Cookies are stored encrypted => Extension stores value also as cookie
 * update config and liveconfig for crowd extension
 
 
-
+* Adde nore errormessages e.g. no final configs
 * Refactor: service for rest paths, constants, etc.
 * Make public repo for releases and nested private git repo for source code
 * add async / promises
