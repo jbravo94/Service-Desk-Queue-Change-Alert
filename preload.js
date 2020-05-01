@@ -180,9 +180,9 @@ rest.post('/setcrowdtokenkey', function (req, res) {
     getPasswordFromOSKeyStore().then((pw) => {
     config.load(pw, (config) => {
       config.crowdTokenKey = token;
-      alert(JSON.stringify(config));
+
       config.save(pw, function() {
-        alert(JSON.stringify(config));
+
         config.setFormValues();
 
         console.log("Config has been saved.");
