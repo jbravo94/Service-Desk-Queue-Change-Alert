@@ -19,14 +19,20 @@ local storage (unencrypted is sufficient, if cookies are stored similairy unencr
 Cookies are stored encrypted => Extension stores value also as cookie
 
 
-* app signature for keychain hoa determind access?
+* app signature for keychain hoa determind access? => Mac only for registered app => Windows open
 
 
-* basic auth only for certain paths => no problem
-* Store crowd token encrypted && credentials
-* encrypt with crowd password
+* basic auth only for certain paths => no problem / Done
+* Store crowd token encrypted && credentials => Done
+* encrypt with crowd password => Done
 
-* update config and livecondig for crowd extension
+* update config and liveconfig for crowd extension
 
-* Refactor
+
+
+* Refactor: service for rest paths, constants, etc.
+* Make public repo for releases and nested private git repo for source code
+* add async / promises
 * Node debugger
+* builds
+* drone files
