@@ -59,7 +59,20 @@ class Config {
           return console.log(err);
         }
 
-        callback && callback();
+        callback && callback(this);
+      });
+    }
+
+    load(password, callback) {
+        fs.readFile('config.json', 'utf8', (err, contents) => {
+
+          if (err) {
+            alert("An error occured while reading JSON Object to File.");
+            return console.log(err);
+          }
+
+          this.loadConfigFromString(contents);
+          callback && callback(this);
       });
     }
 }

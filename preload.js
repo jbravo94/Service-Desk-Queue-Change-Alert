@@ -26,19 +26,15 @@ var DEV_MODE = false;
 var DEV_INTERVAL = DEV_MODE ? 1 : 60;
 var config = new Config();
 
-var plainChromeExtensionPassword = null;
-
 rest.use(express.json());
 
 function loadConfig(callback) {
-  fs.readFile('config.json', 'utf8', function (err, contents) {
 
-    if (err) {
-      alert("An error occured while reading JSON Object to File.");
-      return console.log(err);
-    }
 
-    config.loadConfigFromString(contents);
+    config.load(null, (config) => {
+      callback && callback();
+    });
+  }
 
     // verify with decryption
 
@@ -69,12 +65,10 @@ var result = decipher.finish(); // check 'result' for true/false
 console.log(decipher.output.toHex());
     */
 
-    plainChromeExtensionPassword = config.chromeExtensionPassword;
+    
 
-    callback();
 
-  });
-}
+
 
 window.addEventListener('DOMContentLoaded', () => {
   const replaceText = (selector, text) => {
@@ -86,7 +80,10 @@ window.addEventListener('DOMContentLoaded', () => {
     replaceText(`${type}-version`, process.versions[type])
   }
 
-  loadConfig(function () {
+
+
+
+  loadConfig(() => {
     config.setFormValues();
     enableInterval();
   });
@@ -96,7 +93,7 @@ window.addEventListener('DOMContentLoaded', () => {
     var config = new Config();
     config.getFormValues();
 
-    config.save(null, function() {alert("Config has been saved.");});
+    config.save(null, () => {alert("Config has been saved.");});
   });
 
   $('#installChromeExtension').click(function () {
@@ -206,29 +203,19 @@ function openDialog() {
 
 rest.post('/setcrowdtokenkey', function (req, res) {
 
-  if (!plainChromeExtensionPassword) {
+  if (!config.chromeExtensionPassword) {
     throw new Error("Chrome extension not authorized. Aborted.");
   }
-
-  alert("dd");
-
 
   if (req.body && req.body.crowdtokenkey) {
 
     const token = req.body.crowdtokenkey;
-    fs.readFile('config.json', 'utf8', function (err, contents) {
 
-      if (err) {
-        console.log("An error occured while writing JSON Object to File.");
-        throw new Error(err);
-      }
+    config.load(null, (config) => {
 
-      var configC = new Config();
-      configC.loadConfigFromString(contents);
-      configC.crowdTokenKey = token;
+      config.crowdTokenKey = token;
 
-      configC.save(null, function() {
-        config = configC;
+      config.save(null, function() {
         config.setFormValues();
 
         console.log("Config has been saved.");
@@ -300,39 +287,31 @@ rest.post('/authorizechromeextensiontoken', function (req, res) {
         digest: digest
       };
 
+      config.load(null, (config) => {
 
-      fs.readFile('config.json', 'utf8', function (err, contents) {
+        config.chromeExtensionPassword = newpassword;
 
-        if (err) {
-          console.log("An error occured while writing JSON Object to File.");
-          throw new Error(err);
-        }
-
-        var configC = new Config();
-        configC.loadConfigFromString(contents);
-        configC.chromeExtensionPassword = newpassword;
-
-        configC.save(null, function() {
+        config.save(null, (config) => {
             rest.use(basicAuth({
             users: {
-              'chromeext': plainChromeExtensionPassword
+              'chromeext': config.chromeExtensionPassword
             },
             challenge: true
           }));
+          newsalt = '';
+          res.send(payload);
         });
 
-  
-
       });
-
-
+      
+    } else {
       newsalt = '';
-      res.send(payload);
+      res.send({ message: "Digests not matching. Aborted." });
     }
-
+  } else {
+    newsalt = '';
+    res.send({ message: "Please send payload. Aborted." });
   }
-  newsalt = '';
-  res.send({ message: "Digests not matching. Aborted." });
 });
 
 rest.get('/test', function (req, res) {
@@ -357,10 +336,10 @@ filehosting.get('/cookieextractor.crx', function (req, res) {
 
 loadConfig(function () {
 
-  if (plainChromeExtensionPassword) {
+  if (config.chromeExtensionPassword) {
     rest.use(basicAuth({
       users: {
-        'chromeext': plainChromeExtensionPassword
+        'chromeext': config.chromeExtensionPassword
       },
       challenge: true
     }));
@@ -381,7 +360,5 @@ loadConfig(function () {
     }, rest)
       .listen(port, () => console.log(`Chrome extension connector listening on port ${port}!`))
   );
-
-
 
 });
