@@ -25,3 +25,8 @@ Cookies are stored encrypted => Extension stores value also as cookie
 * basic auth only for certain paths => no problem
 * Store crowd token encrypted && credentials
 * encrypt with crowd password
+
+* update config and livecondig for crowd extension
+
+* Refactor
+* Node debugger

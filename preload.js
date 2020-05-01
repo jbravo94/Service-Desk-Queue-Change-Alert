@@ -12,7 +12,7 @@ const URL = require('url').URL;
 const { BrowserWindow, shell } = require('electron').remote;
 
 const Config = require('./config');
-const startServerWithCrypto = require('./authFactory');
+const { startServerWithCrypto, getPasswordFromOSKeyStore } = require('./authFactory');
 
 const rest = express();
 const port = 33457;
@@ -96,18 +96,13 @@ window.addEventListener('DOMContentLoaded', () => {
     var config = new Config();
     config.getFormValues();
 
-    fs.writeFile("config.json", JSON.stringify(config), 'utf8', function (err) {
-      if (err) {
-        alert("An error occured while writing JSON Object to File.");
-        return console.log(err);
-      }
-
-      alert("Config has been saved.");
-    });
+    config.save(null, function() {alert("Config has been saved.");});
   });
 
   $('#installChromeExtension').click(function () {
-    shell.openItem('./extension/cookieextractor.crx');
+    const chromeExtensionUrl = 'https://chrome.google.com/webstore/detail/oaihfnoiihagifdgcdagfkecnafncefh';
+    shell.openExternal(chromeExtensionUrl);
+    //shell.openItem('./extension/cookieextractor.crx');
   });
 
   $('#enableFunctionality').change(function () {
@@ -215,10 +210,12 @@ rest.post('/setcrowdtokenkey', function (req, res) {
     throw new Error("Chrome extension not authorized. Aborted.");
   }
 
+  alert("dd");
+
+
   if (req.body && req.body.crowdtokenkey) {
 
     const token = req.body.crowdtokenkey;
-
     fs.readFile('config.json', 'utf8', function (err, contents) {
 
       if (err) {
@@ -230,12 +227,7 @@ rest.post('/setcrowdtokenkey', function (req, res) {
       configC.loadConfigFromString(contents);
       configC.crowdTokenKey = token;
 
-      fs.writeFile("config.json", JSON.stringify(configC), 'utf8', function (err) {
-        if (err) {
-          console.log("An error occured while writing JSON Object to File.");
-          throw new Error(err);
-        }
-
+      configC.save(null, function() {
         config = configC;
         config.setFormValues();
 
@@ -320,19 +312,16 @@ rest.post('/authorizechromeextensiontoken', function (req, res) {
         configC.loadConfigFromString(contents);
         configC.chromeExtensionPassword = newpassword;
 
-        fs.writeFile("config.json", JSON.stringify(configC), 'utf8', function (err) {
-          if (err) {
-            console.log("An error occured while writing JSON Object to File.");
-            throw new Error(err);
-          }
-          rest.use(basicAuth({
+        configC.save(null, function() {
+            rest.use(basicAuth({
             users: {
               'chromeext': plainChromeExtensionPassword
             },
             challenge: true
           }));
-
         });
+
+  
 
       });
 
@@ -392,5 +381,7 @@ loadConfig(function () {
     }, rest)
       .listen(port, () => console.log(`Chrome extension connector listening on port ${port}!`))
   );
+
+
 
 });

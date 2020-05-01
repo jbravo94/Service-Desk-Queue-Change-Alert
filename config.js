@@ -1,4 +1,9 @@
+const fs = require('fs');
+
 class Config {
+
+  // TODO Make this working
+    static fileName = "config.json";
 
     constructor(baseurl, username, password, serviceDeskId, queueId, interval, crowdTokenKey, chromeExtensionPassword) {
         this.baseurl = baseurl;
@@ -45,6 +50,17 @@ class Config {
       this.interval = c.interval;
       this.crowdTokenKey = c.crowdTokenKey;
       this.chromeExtensionPassword = c.chromeExtensionPassword;
+    }
+
+    save(password, callback) {
+      fs.writeFile("config.json", JSON.stringify(this), 'utf8', (err) => {
+        if (err) {
+          alert("An error occured while writing JSON Object to File.");
+          return console.log(err);
+        }
+
+        callback && callback();
+      });
     }
 }
 
