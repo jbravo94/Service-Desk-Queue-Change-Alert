@@ -3,9 +3,41 @@
   "version": "1.0.0",
   "description": "A minimal Electron application",
   "main": "main.js",
+  "author": "Johannes Heinzl <jh.heinzl@gmail.com>",
+  "license": "BSD",
   "scripts": {
     "start": "electron .",
-    "electron-rebuild": "$(npm bin)/electron-rebuild"
+    "electron-rebuild": "$(npm bin)/electron-rebuild",
+    "postinstall": "$(npm bin)/electron-builder install-app-deps",
+    "pack": "$(npm bin)/electron-builder build --dir",
+    "dist": "$(npm bin)/electron-builder build"
+  },
+  "build": {
+    "appId": "dev.heinzl.servicedeskqueuechangealert",
+    "dmg": {
+      "contents": [
+        {
+          "x": 110,
+          "y": 150
+        },
+        {
+          "x": 240,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "win": {
+      "target": "squirrel",
+      "icon": "Windows-Ico.ico"
+    }
   },
   "repository": "https://github.com/electron/electron-quick-start",
   "keywords": [
@@ -15,10 +47,9 @@
     "tutorial",
     "demo"
   ],
-  "author": "GitHub",
-  "license": "CC0-1.0",
   "devDependencies": {
     "electron": "^8.1.1",
+    "electron-builder": "^22.6.0",
     "electron-rebuild": "^1.10.1"
   },
   "dependencies": {

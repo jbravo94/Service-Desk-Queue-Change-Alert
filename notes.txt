@@ -18,6 +18,9 @@ local storage (unencrypted is sufficient, if cookies are stored similairy unencr
 
 Cookies are stored encrypted => Extension stores value also as cookie
 
+https://medium.com/how-to-electron/a-complete-guide-to-packaging-your-electron-app-1bdc717d739f
+https://www.icoconverter.com/
+https://cloudconvert.com/png-to-icns
 
 * app signature for keychain hoa determind access? => Mac only for registered app => Windows open
 

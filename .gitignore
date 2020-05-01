@@ -5,3 +5,4 @@ publickey.pem
 cert.pem
 password.txt
 config copy.json
+dist
