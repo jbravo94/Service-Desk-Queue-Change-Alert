@@ -43,6 +43,8 @@ https://cloudconvert.com/png-to-icns
 * fix tray icon
 * fix local ssl certificate trust
 * fix quitting in app
+* Change name and version for app
+* Add commandline toggle for dev tools
 
 Local sockets on ports cannot be intercepted => If port is not available - no connection possible. 
 But socket must be bound to 127.0.0.1, not localhost to prevent dns redirection also via hosts file.
