@@ -285,7 +285,12 @@ rest.post('/authorizechromeextensiontoken', function (req, res) {
 });
 
 rest.get('/test', function (req, res) {
-  res.send('hello world');
+
+  var stringtocompare = forge.util.bytesToHex(forge.random.getBytesSync(4)).toUpperCase().split('').join(' ');
+
+  res.send('Test request over HTTPS was successful. You can compare your verification code with you application: ' + stringtocompare + '. You can close this window.');
+
+  alert('Verification code: ' + stringtocompare);
 });
 
 rest.use('/extension', express.static(__dirname + '/extension'));
