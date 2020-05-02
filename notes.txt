@@ -40,11 +40,12 @@ https://cloudconvert.com/png-to-icns
 * builds
 * drone files
 
-* fix tray icon
-* fix local ssl certificate trust
-* fix quitting in app
-* Change name and version for app
+* fix tray icon => Done
+* fix local ssl certificate trust => Done => Accepting in Browser not in certificate store
+* fix quitting in app => Done
+* Change name and version for app => Done, partly
 * Add commandline toggle for dev tools
 
 Local sockets on ports cannot be intercepted => If port is not available - no connection possible. 
 But socket must be bound to 127.0.0.1, not localhost to prevent dns redirection also via hosts file.
+=> But SSL is generally better, since original application must not be checked if it is really running and not a fake app.
