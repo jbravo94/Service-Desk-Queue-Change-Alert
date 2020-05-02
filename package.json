@@ -1,7 +1,7 @@
 {
-  "name": "electron-quick-start",
+  "name": "service-desk-queue-change-alert",
   "version": "1.0.0",
-  "description": "A minimal Electron application",
+  "description": "This is the 'Service Desk Queue Change Alert' app.",
   "main": "main.js",
   "author": "Johannes Heinzl <jh.heinzl@gmail.com>",
   "license": "BSD",
@@ -36,16 +36,14 @@
     },
     "win": {
       "target": "nsis",
-      "icon": "Windows-Ico.ico"
+      "icon": "build/icon.ico"
     }
   },
-  "repository": "https://github.com/electron/electron-quick-start",
+  "repository": "https://github.com/jbravo94/Service-Desk-Queue-Change-Alert",
   "keywords": [
-    "Electron",
-    "quick",
-    "start",
-    "tutorial",
-    "demo"
+    "electron",
+    "atlassian-jira-service-desk",
+    "service-desk-queue-change-alert"
   ],
   "devDependencies": {
     "electron": "^8.1.1",

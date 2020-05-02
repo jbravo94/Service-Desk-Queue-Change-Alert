@@ -3,6 +3,12 @@ const { app, BrowserWindow, Menu, Tray } = require('electron');
 const path = require('path');
 const express = require('express');
 
+var mainWindow = null;
+
+// These needed definitely be defined outside function scope: https://github.com/electron/electron/issues/822
+var appIcon = null;
+var contextMenu = null;
+
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -31,11 +37,12 @@ function createWindow() {
 
     return false;
   });
-  //mainWindow.setMenu(null);
 
-  var appIcon = null;
+  // Hides menu for windows app
+  // mainWindow.setMenu(null);
+
   appIcon = new Tray(path.join(__dirname, 'Icon-16.png'));
-  var contextMenu = Menu.buildFromTemplate([
+  contextMenu = Menu.buildFromTemplate([
     {
       label: 'Show App', click: function () {
         mainWindow.show();
