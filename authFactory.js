@@ -118,13 +118,8 @@ const generateCrypto = function (password) {
 };
 
 
-const getPasswordFromOSKeyStore = function () {
-    return keytar.getPassword(appIdentifier, currentOSUserName);
-};
-
-const getPrivateKeyAndCertificate = async function () {
-
-    var pw = await getPasswordFromOSKeyStore();
+const getPasswordFromOSKeyStore = async function () {
+    var pw = await keytar.getPassword(appIdentifier, currentOSUserName);
 
     if (!pw) {
         const password = forge.util.bytesToHex(forge.random.getBytesSync(64)).toUpperCase();
@@ -133,6 +128,12 @@ const getPrivateKeyAndCertificate = async function () {
         await keytar.setPassword(appIdentifier, currentOSUserName, password);
         pw = password;
     }
+    return pw;
+};
+
+const getPrivateKeyAndCertificate = async function () {
+
+    var pw = await getPasswordFromOSKeyStore();
 
     if (checkCrypto()) {
         return getCrypto(pw);
