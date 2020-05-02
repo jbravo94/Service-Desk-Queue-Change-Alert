@@ -31,7 +31,7 @@ function createWindow() {
 
     return false;
   });
-  mainWindow.setMenu(null);
+  //mainWindow.setMenu(null);
 
   var appIcon = null;
   appIcon = new Tray(path.join(__dirname, 'Icon-16.png'));
