@@ -7,10 +7,10 @@
   "license": "BSD",
   "scripts": {
     "start": "electron .",
-    "electron-rebuild": "$(npm bin)/electron-rebuild",
-    "postinstall": "$(npm bin)/electron-builder install-app-deps",
-    "pack": "$(npm bin)/electron-builder build --dir",
-    "dist": "$(npm bin)/electron-builder build"
+    "electron-rebuild": "./node_modules/.bin/electron-rebuild",
+    "postinstall": "./node_modules/.bin/electron-builder install-app-deps",
+    "pack": "./node_modules/.bin/electron-builder build --dir",
+    "dist": "./node_modules/.bin/electron-builder build"
   },
   "build": {
     "appId": "dev.heinzl.servicedeskqueuechangealert",
@@ -35,7 +35,7 @@
       ]
     },
     "win": {
-      "target": "squirrel",
+      "target": "nsis",
       "icon": "Windows-Ico.ico"
     }
   },
