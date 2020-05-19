@@ -42,7 +42,8 @@ Note: If you're using Linux Bash for Windows, [see this guide](https://www.howto
 
 ## Icon
 https://dlpng.com/png/6658669
+https://www.iconsdb.com/soylent-red-icons/google-alerts-icon.html
 
-## License
+## Licensehttps://www.iconsdb.com/soylent-red-icons/google-alerts-icon.html
 
 [CC0 1.0 (Public Domain)](LICENSE.md)
