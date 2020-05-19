@@ -54,11 +54,12 @@ window.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById("save").addEventListener('click', () => {
 
-    var config = new Config();
     config.getFormValues();
 
     getPasswordFromOSKeyStore().then((pw) => {
-    config.save(pw, () => {alert("Config has been saved.");});
+      config.save(pw, () => {
+        alert("Config has been saved.");
+      });
     });
   });
 
@@ -121,7 +122,7 @@ window.addEventListener('DOMContentLoaded', () => {
           var statusCode = res.statusCode;
 
           if (statusCode !== 200 && statusCode !== 201) {
-            
+
             alert("Error occured: " + bodyBuffer.toString());
 
           } else {
