@@ -120,22 +120,24 @@ window.addEventListener('DOMContentLoaded', () => {
 
           var statusCode = res.statusCode;
 
-          if (statusCode !== 200 || statusCode !== 201) {
-            alert.error("Error occured: " + bodyBuffer.toString());
-            return;
+          if (statusCode !== 200 && statusCode !== 201) {
+            
+            alert("Error occured: " + bodyBuffer.toString());
+
+          } else {
+
+            var body = JSON.parse(bodyBuffer.toString());
+            console.log(body);
+            console.log('No more data in response.');
+
+            processResponse(body.issueCount);
+
           }
-
-          var body = JSON.parse(bodyBuffer.toString());
-          console.log(body);
-          console.log('No more data in response.');
-
-          processResponse(body.issueCount);
-
         })
       });
 
       req.on('error', (e) => {
-        alert.error("Error occured: " + JSON.stringify(e));
+        alert("Error occured: " + JSON.stringify(e));
       });
 
       req.end();
