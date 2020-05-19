@@ -7,7 +7,7 @@ const URL = require('url').URL;
 
 const { shell } = require('electron');
 
-const Config = require('./config');
+const { getPasswordFromOSKeyStore } = require('./authFactory');
 
 function closeCurrentWindow() {
   var window = require('electron').remote.getCurrentWindow();
@@ -20,71 +20,65 @@ window.addEventListener('DOMContentLoaded', () => {
     closeCurrentWindow();
   });
 
-  fs.readFile('config.json', 'utf8', function (err, contents) {
+  getPasswordFromOSKeyStore().then((pw) => {
+    config.load(pw, (config) => {
 
-    if (err) {
-      alert("An error occured while reading JSON Object to File.");
-      return console.log(err);
-    }
+      document.getElementById('openQueue').addEventListener('click', () => {
 
-    var config = new Config();
-    config.loadConfigFromString(contents);
+        var headers = {
+          'Content-Type': 'application/json'
+        };
 
-    document.getElementById('openQueue').addEventListener('click', () => {
+        if (config.crowdTokenKey) {
+          var cookie = `crowd.token_key=${config.crowdTokenKey}`;
+          headers['Cookie'] = cookie;
+        } else {
+          headers["Authorization"] = "Basic " + btoa(config.username + ":" + config.password);
+        }
 
-      var headers = {
-        'Content-Type': 'application/json'
-      };
+        var hostname = new URL(config.baseurl).hostname;
 
-      if (config.crowdTokenKey) {
-        var cookie = `crowd.token_key=${config.crowdTokenKey}`;
-        headers['Cookie'] = cookie;
-      } else {
-        headers["Authorization"] = "Basic " + btoa(config.username + ":" + config.password);
-      }
+        const options = {
+          hostname: hostname,
+          port: 443,
+          path: `/rest/servicedeskapi/servicedesk/${config.serviceDeskId}`,
+          method: 'GET',
+          headers: headers
+        };
 
-      var hostname = new URL(config.baseurl).hostname;
+        var bodyBuffer = [];
 
-      const options = {
-        hostname: hostname,
-        port: 443,
-        path: `/rest/servicedeskapi/servicedesk/${config.serviceDeskId}`,
-        method: 'GET',
-        headers: headers
-      };
+        const req = https.request(options, (res) => {
+          console.log('statusCode:', res.statusCode);
+          console.log('headers:', res.headers);
 
-      var bodyBuffer = [];
+          res.on('data', (d) => {
 
-      const req = https.request(options, (res) => {
-        console.log('statusCode:', res.statusCode);
-        console.log('headers:', res.headers);
+            bodyBuffer = bodyBuffer.concat(d);
+          });
 
-        res.on('data', (d) => {
+          res.on('end', () => {
 
-          bodyBuffer = bodyBuffer.concat(d);
+            var body = JSON.parse(bodyBuffer.toString());
+            console.log(body);
+            console.log('No more data in response.');
+
+            var url = `${config.baseurl}/projects/${body.projectKey}/queues/custom/${config.queueId}`;
+            shell.openExternal(url);
+
+            setTimeout(function () {
+              closeCurrentWindow();
+            }, 1000);
+
+          })
         });
 
-        res.on('end', () => {
+        req.on('error', (e) => {
+          console.error(e);
+        });
 
-          var body = JSON.parse(bodyBuffer.toString());
-          console.log(body);
-          console.log('No more data in response.');
-
-          var url = `${config.baseurl}/projects/${body.projectKey}/queues/custom/${config.queueId}`;
-          shell.openExternal(url);
-
-          setTimeout(function () {
-            closeCurrentWindow();
-          }, 1000);
-
-        })
+        req.end();
       });
-
-      req.on('error', (e) => {
-        console.error(e);
-      });
-
-      req.end();
     });
   });
 });
