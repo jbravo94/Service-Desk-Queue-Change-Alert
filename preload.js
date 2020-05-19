@@ -118,6 +118,13 @@ window.addEventListener('DOMContentLoaded', () => {
 
         res.on('end', () => {
 
+          var statusCode = res.statusCode;
+
+          if (statusCode !== 200 || statusCode !== 201) {
+            alert.error("Error occured: " + bodyBuffer.toString());
+            return;
+          }
+
           var body = JSON.parse(bodyBuffer.toString());
           console.log(body);
           console.log('No more data in response.');

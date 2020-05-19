@@ -9,6 +9,10 @@ const { shell } = require('electron');
 
 const { getPasswordFromOSKeyStore } = require('./authFactory');
 
+const Config = require('./config');
+
+var config = new Config();
+
 function closeCurrentWindow() {
   var window = require('electron').remote.getCurrentWindow();
   window.close();
