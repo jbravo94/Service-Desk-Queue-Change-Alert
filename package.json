@@ -57,6 +57,6 @@
     "keytar": "^5.5.0",
     "node-forge": "^0.9.1",
     "pem": "^1.14.4",
-    "underscore": "^1.10.2"
+    "underscore": "^1.12.1"
   }
 }
