@@ -51,7 +51,7 @@
     "electron-rebuild": "^1.10.1"
   },
   "dependencies": {
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "express-basic-auth": "^1.2.0",
     "forge": "^2.3.0",
     "keytar": "^5.5.0",
